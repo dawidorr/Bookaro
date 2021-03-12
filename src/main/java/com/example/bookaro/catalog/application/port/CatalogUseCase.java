@@ -5,12 +5,16 @@ import lombok.Builder;
 import lombok.Setter;
 import lombok.Value;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 public interface CatalogUseCase {
+
     List<Book> findByTitle(String title);
+
+    Optional<Book> findOneByTitle(String title);
 
     List<Book> findByAuthor(String author);
 
@@ -25,28 +29,33 @@ public interface CatalogUseCase {
     void removeById(Long Id);
 
     @Value
-    class CreateBookCommand{
+    class CreateBookCommand {
         String title;
         String author;
         Integer year;
+        BigDecimal price;
+
+        public Book toBook() {
+            return new Book(title, author, year, price);
+        }
     }
 
     @Value
     @Builder
-    class UpdateBookCommand{
+    class UpdateBookCommand {
         Long id;
         String title;
         String author;
         Integer year;
 
-        public Book updateFields(Book book){
-            if(title != null ){
+        public Book updateFields(Book book) {
+            if (title != null) {
                 book.setTitle(title);
             }
-            if(author != null ){
+            if (author != null) {
                 book.setAuthor(author);
             }
-            if(year != null ){
+            if (year != null) {
                 book.setYear(year);
             }
             return book;
@@ -54,7 +63,7 @@ public interface CatalogUseCase {
     }
 
     @Value
-    class UpdateBookResponse{
+    class UpdateBookResponse {
         public static UpdateBookResponse SUCCESS = new UpdateBookResponse(true, Collections.emptyList());
 
         boolean success;
