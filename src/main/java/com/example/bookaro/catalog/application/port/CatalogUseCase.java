@@ -2,7 +2,6 @@ package com.example.bookaro.catalog.application.port;
 
 import com.example.bookaro.catalog.domain.Book;
 import lombok.Builder;
-import lombok.Setter;
 import lombok.Value;
 
 import java.math.BigDecimal;
@@ -12,17 +11,23 @@ import java.util.Optional;
 
 public interface CatalogUseCase {
 
+    List<Book> findAll();
+
+    Optional<Book> findById(Long id);
+
     List<Book> findByTitle(String title);
 
     Optional<Book> findOneByTitle(String title);
 
-    List<Book> findByAuthor(String author);
+    Optional<Book> findOneByAuthor(String author);
 
-    List<Book> findAll();
+    List<Book> findByAuthor(String author);
 
     Optional<Book> findOneByTitleAndAuthor(String title, String author);
 
-    void addBook(CreateBookCommand command);
+    List<Book> findByTitleAndAuthor(String title, String author);
+
+    Book addBook(CreateBookCommand command);
 
     UpdateBookResponse updateBook(UpdateBookCommand command);
 
@@ -47,6 +52,7 @@ public interface CatalogUseCase {
         String title;
         String author;
         Integer year;
+        BigDecimal price;
 
         public Book updateFields(Book book) {
             if (title != null) {
@@ -57,6 +63,9 @@ public interface CatalogUseCase {
             }
             if (year != null) {
                 book.setYear(year);
+            }
+            if(price != null){
+                book.setPrice(price);
             }
             return book;
         }

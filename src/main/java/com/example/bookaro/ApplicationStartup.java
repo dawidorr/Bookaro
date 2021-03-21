@@ -4,7 +4,6 @@ package com.example.bookaro;
 import com.example.bookaro.catalog.application.port.CatalogUseCase;
 import com.example.bookaro.catalog.application.port.CatalogUseCase.CreateBookCommand;
 import com.example.bookaro.catalog.application.port.CatalogUseCase.UpdateBookCommand;
-import com.example.bookaro.catalog.application.port.CatalogUseCase.UpdateBookCommand.UpdateBookCommandBuilder;
 import com.example.bookaro.catalog.application.port.CatalogUseCase.UpdateBookResponse;
 import com.example.bookaro.catalog.domain.Book;
 import com.example.bookaro.order.application.port.PlaceOrderUseCase;
@@ -62,7 +61,7 @@ public class ApplicationStartup implements CommandLineRunner {
                 .builder()
                 .name("Jan Kowalski")
                 .phone("123-456-789")
-                .street("Armii krajowej 31")
+                .street("Armii Krajowej 31")
                 .city("Krakow")
                 .zipCode("30-150")
                 .email("jan@example.org")
@@ -87,7 +86,6 @@ public class ApplicationStartup implements CommandLineRunner {
     private void searchCatalog() {
         findByTitle();
         findAndUpdate();
-        findByTitle();
     }
 
     private void initData() {
@@ -121,6 +119,7 @@ public class ApplicationStartup implements CommandLineRunner {
                             .title("Pan Tadeusz, czyli Ostatni Zjazd na Litwie")
                             .build();
                     UpdateBookResponse response = catalog.updateBook(command);
+                    System.out.println("----tutaj" + command);
                     System.out.println("Updating book result: "+ response.isSuccess());
                 });
 
