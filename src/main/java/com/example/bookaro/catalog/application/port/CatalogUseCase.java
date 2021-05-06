@@ -1,6 +1,7 @@
 package com.example.bookaro.catalog.application.port;
 
 import com.example.bookaro.catalog.domain.Book;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 
@@ -33,6 +34,19 @@ public interface CatalogUseCase {
 
     void removeById(Long Id);
 
+    void updateBookCover(UpdateBookCoverCommand command);
+
+    void removeBookCover(Long id);
+
+    @Value
+    class UpdateBookCoverCommand {
+        Long id;
+        byte[] file;
+        String contentType;
+        String filename;
+    }
+
+
     @Value
     class CreateBookCommand {
         String title;
@@ -47,6 +61,7 @@ public interface CatalogUseCase {
 
     @Value
     @Builder
+    @AllArgsConstructor
     class UpdateBookCommand {
         Long id;
         String title;
@@ -78,4 +93,6 @@ public interface CatalogUseCase {
         boolean success;
         List<String> errors;
     }
+
+
 }

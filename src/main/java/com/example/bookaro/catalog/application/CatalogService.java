@@ -3,6 +3,8 @@ package com.example.bookaro.catalog.application;
 import com.example.bookaro.catalog.application.port.CatalogUseCase;
 import com.example.bookaro.catalog.domain.Book;
 import com.example.bookaro.catalog.domain.CatalogRepository;
+import com.example.bookaro.uploads.application.ports.UploadUseCase;
+import com.example.bookaro.uploads.domain.Upload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ class CatalogService implements CatalogUseCase {
 
 
     private final CatalogRepository repository;
+    private final UploadUseCase upload;
 
 
     @Override
@@ -106,6 +109,30 @@ class CatalogService implements CatalogUseCase {
 
     }
 
+    @Override
+    public void updateBookCover(UpdateBookCoverCommand command) {
+        repository.findById(command.getId())
+                .ifPresent(book -> {
+                    Upload savedUpload = upload.save(new UploadUseCase.SaveUploadCommand(command.getFilename(), command.getFile(), command.getContentType()));
+                    book.setCoverId(savedUpload.getId());
+                    repository.save(book);
+                });
+    }
+
+    @Override
+    public void removeBookCover(Long id) {
+        repository.findById(id)
+                .ifPresent(book -> {
+                    if (book.getCoverId() != null) {
+
+                        upload.removeById(book.getCoverId());
+                        book.setCoverId(null);
+                        repository.save(book);
+
+                    }
+                });
+
+    }
 
 
 }
