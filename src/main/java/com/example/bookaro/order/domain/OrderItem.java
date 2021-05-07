@@ -1,11 +1,10 @@
 package com.example.bookaro.order.domain;
 
-import com.example.bookaro.catalog.domain.Book;
 import lombok.Value;
 
 @Value
 public class OrderItem {
-    Book book;
+    Long bookId;
     int quantity;
 
 }

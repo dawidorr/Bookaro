@@ -6,9 +6,7 @@ import com.example.bookaro.catalog.application.port.CatalogUseCase.CreateBookCom
 import com.example.bookaro.catalog.application.port.CatalogUseCase.UpdateBookCommand;
 import com.example.bookaro.catalog.application.port.CatalogUseCase.UpdateBookResponse;
 import com.example.bookaro.catalog.domain.Book;
-import com.example.bookaro.order.application.port.PlaceOrderUseCase;
-import com.example.bookaro.order.application.port.PlaceOrderUseCase.PlaceOrderCommand;
-import com.example.bookaro.order.application.port.PlaceOrderUseCase.PlaceOrderResponse;
+import com.example.bookaro.order.application.port.ManipulateOrderUseCase;
 import com.example.bookaro.order.application.port.QueryOrderUseCase;
 import com.example.bookaro.order.domain.OrderItem;
 import com.example.bookaro.order.domain.Recipient;
@@ -19,11 +17,13 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.example.bookaro.order.application.port.ManipulateOrderUseCase.*;
+
 @Component
 public class ApplicationStartup implements CommandLineRunner {
 
     private final CatalogUseCase catalog;
-    private final PlaceOrderUseCase placeOrder;
+    private final ManipulateOrderUseCase placeOrder;
     private final QueryOrderUseCase queryOrder;
     private final String title;
     private final String author;
@@ -31,7 +31,7 @@ public class ApplicationStartup implements CommandLineRunner {
 
     public ApplicationStartup(
             CatalogUseCase catalog,
-            PlaceOrderUseCase placeOrder,
+            ManipulateOrderUseCase placeOrder,
             QueryOrderUseCase queryOrder,
             @Value("${bookaro.catalog.query.title}") String title,
             @Value("${bookaro.catalog.query.author}") String author,
@@ -71,16 +71,19 @@ public class ApplicationStartup implements CommandLineRunner {
         PlaceOrderCommand command = PlaceOrderCommand
                 .builder()
                 .recipient(recipient)
-                .item(new OrderItem(panTadeusz, 16))
-                .item(new OrderItem(chlopi, 7))
+                .item(new OrderItem(panTadeusz.getId(), 16))
+                .item(new OrderItem(chlopi.getId(), 7))
                 .build();
 
         PlaceOrderResponse response = placeOrder.placeOrder(command);
-        System.out.println("Created ORDER with id: "+ response.getOrderId());
+        String result = response.handle(
+                orderId -> "Created ORDER with id: " + orderId,
+                error -> "Failed to created order: " + error
+        );
+        System.out.println(result);
         //list all orders
 
-        queryOrder.findAll()
-                .forEach(order -> System.out.println("GOT ORDER WITH TOTAL PRICE: "+ order.totalPrice() + " DETAILS: " + order));
+        //queryOrder.findAll().forEach(order -> System.out.println("GOT ORDER WITH TOTAL PRICE: "+ order.totalPrice() + " DETAILS: " + order));
     }
 
     private void searchCatalog() {

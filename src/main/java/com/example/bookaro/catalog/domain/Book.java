@@ -1,18 +1,19 @@
 package com.example.bookaro.catalog.domain;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 
 @Getter
 @Setter
-@AllArgsConstructor
+@RequiredArgsConstructor
 @ToString
+@Entity
 public class Book {
+    @Id
     private Long id;
     private String title;
     private String author;

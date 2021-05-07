@@ -2,6 +2,7 @@ package com.example.bookaro.catalog.web;
 
 import com.example.bookaro.catalog.application.port.CatalogUseCase;
 import com.example.bookaro.catalog.domain.Book;
+import com.example.bookaro.web.CreatedURI;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
