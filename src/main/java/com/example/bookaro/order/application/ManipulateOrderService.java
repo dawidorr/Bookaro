@@ -1,8 +1,8 @@
 package com.example.bookaro.order.application;
 
 import com.example.bookaro.order.application.port.ManipulateOrderUseCase;
+import com.example.bookaro.order.db.OrderJpaRepository;
 import com.example.bookaro.order.domain.Order;
-import com.example.bookaro.order.domain.OrderRepository;
 import com.example.bookaro.order.domain.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ManipulateOrderService implements ManipulateOrderUseCase {
-    private final OrderRepository repository;
+    private final OrderJpaRepository repository;
 
     @Override
     public PlaceOrderResponse placeOrder(PlaceOrderCommand command) {
