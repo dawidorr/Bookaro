@@ -1,8 +1,10 @@
 package com.example.bookaro.catalog.application;
 
 import com.example.bookaro.catalog.application.port.CatalogUseCase;
+import com.example.bookaro.catalog.db.AuthorJpaRepository;
+import com.example.bookaro.catalog.db.BookJpaRepository;
+import com.example.bookaro.catalog.domain.Author;
 import com.example.bookaro.catalog.domain.Book;
-import com.example.bookaro.catalog.domain.CatalogRepository;
 import com.example.bookaro.uploads.application.ports.UploadUseCase;
 import com.example.bookaro.uploads.domain.Upload;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,8 +21,9 @@ import java.util.stream.Collectors;
 class CatalogService implements CatalogUseCase {
 
 
-    private final CatalogRepository repository;
+    private final BookJpaRepository repository;
     private final UploadUseCase upload;
+    private final AuthorJpaRepository authorRepository;
 
 
     @Override
@@ -53,41 +57,50 @@ class CatalogService implements CatalogUseCase {
     public Optional<Book> findOneByAuthor(String author) {
         return repository.findAll()
                 .stream()
-                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
+//                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
                 .findFirst();
     }
 
 
     @Override
     public List<Book> findByAuthor(String author) {
-        return repository.findAll()
-                .stream()
-                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
-                .collect(Collectors.toList());
+        return repository
+                .findByAuthor(author);
+
     }
 
-    @Override
-    public Optional<Book> findOneByTitleAndAuthor(String title, String author) {
-        return repository.findAll()
-                .stream()
-                .filter(book -> book.getAuthor().contains(author))
-                .filter(book -> book.getTitle().contains(title))
-                .findFirst();
-    }
+
 
     @Override
     public List<Book> findByTitleAndAuthor(String title, String author) {
         return repository.findAll()
                 .stream()
                 .filter(book -> book.getTitle().toLowerCase().contains(title.toLowerCase()))
-                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
+//                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Book addBook(CreateBookCommand command) {
-        Book book = command.toBook();
+        Book book = toBook(command);
         return repository.save(book);
+    }
+
+    private Book toBook(CreateBookCommand command) {
+        Book book = new Book(command.getTitle(), command.getYear(), command.getPrice());
+        Set<Author> authors = fetchAuthorsByIds(command.getAuthors());
+        book.setAuthors(authors);
+        return book;
+    }
+
+    private Set<Author> fetchAuthorsByIds(Set<Long> authors) {
+        return authors
+                .stream()
+                .map(authorId -> authorRepository
+                        .findById(authorId)
+                        .orElseThrow(() -> new IllegalArgumentException("Unable to find author with id: " + authorId))
+                )
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -95,7 +108,7 @@ class CatalogService implements CatalogUseCase {
         return repository
                 .findById(command.getId())
                 .map(book -> {
-                    Book updatedBook = command.updateFields(book);
+                    Book updatedBook = updateFields(command,book);
                     repository.save(updatedBook);
                     return UpdateBookResponse.SUCCESS;
                 })
@@ -103,9 +116,26 @@ class CatalogService implements CatalogUseCase {
 
     }
 
+    private Book updateFields(UpdateBookCommand command, Book book ){
+            if (command.getTitle() != null) {
+                book.setTitle(command.getTitle());
+            }
+            if (command.getAuthors() != null && command.getAuthors().size() > 0) {
+                book.setAuthors(fetchAuthorsByIds(command.getAuthors()));
+            }
+            if (command.getYear() != null) {
+                book.setYear(command.getYear());
+            }
+            if(command.getPrice() != null){
+                book.setPrice(command.getPrice());
+            }
+            return book;
+
+    }
+
     @Override
     public void removeById(Long id) {
-        repository.removeById(id);
+        repository.deleteById(id);
 
     }
 
