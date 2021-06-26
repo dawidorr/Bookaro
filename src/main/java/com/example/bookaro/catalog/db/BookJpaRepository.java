@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface BookJpaRepository extends JpaRepository<Book, Long> {
 
-    List<Book> findByAuthors_firstNameContainsIgnoreCaseOrAuthors_lastNameContainsIgnoreCase(String fistName, String lastName);
+//    List<Book> findByAuthors_firstNameContainsIgnoreCaseOrAuthors_lastNameContainsIgnoreCase(String fistName, String lastName);
 
 
     @Query(
